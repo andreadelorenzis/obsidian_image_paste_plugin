@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, normalizePath, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 const html = `
 <div align="center">
@@ -28,14 +28,29 @@ export default class CustomImagePaste extends Plugin {
 		const blob = item.getAsFile();
 		if (!blob) return;
 
+		// Prende la vista markdown attiva
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (!view) return;
+
+		// File attualmente aperto
+		const file = view.file;
+		if (!file) return;
+
+		// Cartella padre
+		const parentFolder = file.parent;
+		const folderPath = parentFolder?.path;
+		const attachmentsFolder = "Attachments";
+		const normalizedFolderPath = normalizePath(`${folderPath}/${attachmentsFolder}`);
+
 		// Nome file con timestamp per evitare conflitti
 		const filename = `pasted-image-${Date.now()}.png`;
-
-		const folder = "Attachments";
-		if (!(await this.app.vault.adapter.exists(folder))) {
-			await this.app.vault.createFolder(folder);
+		const path = `${folderPath}/${attachmentsFolder}/${filename}`;
+		console.log(path);
+		
+		// Crea la cartella Attachments nella cartella del file
+		if (!(await this.app.vault.adapter.exists(normalizedFolderPath))) {
+			await this.app.vault.createFolder(normalizedFolderPath);
 		}
-		const path = `${folder}/${filename}`;
 
 		// Salva il file nel vault
 		const arrayBuffer = await blob.arrayBuffer();
