@@ -1,9 +1,10 @@
 import { App, Editor, MarkdownView, Modal, normalizePath, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 const html = `
-<div align="center">
-	<img src="{path}" width="400" />
-</div>
+<figure style="text-align:center;">
+    <img src="{path}" width="400" />
+    <figcaption></figcaption>
+</figure>
 `
 
 export default class CustomImagePaste extends Plugin {
